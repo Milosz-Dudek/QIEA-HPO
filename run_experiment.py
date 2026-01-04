@@ -46,6 +46,7 @@ def build_objective(task: str):
         - "svm_breast_cancer"
         - "mlp_wine"
         - "cnn_cifar10"
+        - "cnn_mnist"
 
     Returns
     -------
@@ -124,8 +125,9 @@ def build_optimizer(
     objective_type : {"single", "multi"}
         Objective mode. Currently, only QIEA consumes "multi" explicitly
         (via its `multi_objective` flag); baselines are single-objective.
-    mo_objectives : {}
-        Objectives for Pareto to be used.
+    mo_objectives : tuple[str, str] | None
+        Objective names to optimize in multi-objective mode (defaults to
+        ("acc", "time") when not provided).
 
     Returns
     -------

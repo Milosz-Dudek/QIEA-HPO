@@ -32,6 +32,7 @@ def run_one(
         out_dir: str,
         objective_type: str,
         mo_objectives: str,
+        python_exec: str,
 ):
     """
     Run a single (optimizer, task, seed) combination by invoking run_experiment.py.
@@ -51,9 +52,13 @@ def run_one(
     objective_type : {"single", "multi"}
         Objective mode. Currently only QIEA consumes "multi" internally;
         baselines remain single-objective.
+    mo_objectives : {"acc_time", "acc_epochs"}
+        Which pair of objectives to forward for multi-objective runs.
+    python_exec : str
+        Python executable to launch the child process (e.g. "python3").
     """
     cmd = [
-        sys.executable,
+        python_exec,
         str(Path(__file__).with_name("run_experiment.py")),
         "--optimizer", optimizer,
         "--task", task,
@@ -103,7 +108,8 @@ def main():
     is executed sequentially by default.
     """
     parser = argparse.ArgumentParser(
-        description="Run all optimizer/task combinations for QIEA-HPO"
+        description="Run all optimizer/task combinations for QIEA-HPO",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "--n_trials",
@@ -126,7 +132,7 @@ def main():
     parser.add_argument(
         "--python_exec",
         type=str,
-        default="python",
+        default=sys.executable,
         help="Python executable to use (e.g. 'python', 'python3', 'py')",
     )
     parser.add_argument(
@@ -170,6 +176,7 @@ def main():
     logger.info(f"Objective Types: {objective_types}")
     logger.info(f"n_trials:        {args.n_trials}")
     logger.info(f"out_dir:         {args.out_dir}")
+    logger.info(f"python_exec:     {args.python_exec}")
 
     for seed, optimizer, task, objective_type in itertools.product(seeds, optimizers, tasks, objective_types):
         run_one(
@@ -180,6 +187,7 @@ def main():
             out_dir=args.out_dir,
             objective_type=objective_type,
             mo_objectives=args.mo_objectives,
+            python_exec=args.python_exec,
         )
 
     logger.info("=== All experiments attempted ===")
